@@ -1,0 +1,13 @@
+# Ignoruj lokalny cache danych Power BI (bardzo ważne w .pbip!)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+
+# Ignoruj tradycyjne pliki binarne .pbix (jeśli jakieś stworzysz roboczo)
+*.pbix
+
+# Ignoruj surowe pliki danych CSV (zostają tylko u Ciebie na dysku)
+data/*.csv
+
+# Pliki systemowe
+.DS_Store
+Thumbs.db
