@@ -1,0 +1,48 @@
+table Dim_Sellers
+	lineageTag: 5ddf7cb6-a8b1-4b37-becb-2b32ff5a34b0
+
+	column seller_id
+		dataType: string
+		lineageTag: 58c202df-077b-4563-aac0-ed798294ce51
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_zip_code_prefix
+		dataType: string
+		lineageTag: 1a0995b8-5f52-49ec-b522-ad14fc2b03b6
+		summarizeBy: none
+		sourceColumn: seller_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_city
+		dataType: string
+		lineageTag: 6fef931f-7742-4daf-af8c-6243ba9c11ac
+		summarizeBy: none
+		sourceColumn: seller_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_state
+		dataType: string
+		lineageTag: 8805c1ef-69b7-491e-a343-9638a263efc4
+		summarizeBy: none
+		sourceColumn: seller_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Sellers = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_sellers_dataset.csv"),[Delimiter=",", Columns=4, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true])
+				in
+				    #"Nagłówki o podwyższonym poziomie"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

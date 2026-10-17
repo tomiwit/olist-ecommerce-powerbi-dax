@@ -1,0 +1,99 @@
+table Fact_Reviews
+	lineageTag: c18bf801-85bd-4818-ad85-15b8c67e860d
+
+	column review_id
+		dataType: string
+		lineageTag: 4b7e44cd-0c3e-4081-9ada-f10363263c9e
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_id
+		dataType: string
+		lineageTag: af7b217e-ba79-4d29-8fbb-441e5f6d3d5b
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_score
+		dataType: int64
+		formatString: 0
+		lineageTag: a73b9089-c5fc-467a-8d16-b62a664fb2b3
+		summarizeBy: sum
+		sourceColumn: review_score
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_comment_title
+		dataType: string
+		lineageTag: 42d38229-7bbc-4926-9e1d-8faa5a14b638
+		summarizeBy: none
+		sourceColumn: review_comment_title
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_comment_message
+		dataType: string
+		lineageTag: 15fd446f-f9a3-4cbc-a643-d03931d32b1e
+		summarizeBy: none
+		sourceColumn: review_comment_message
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_creation_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 4568857f-ee87-49a8-bb21-2df8311e019b
+		summarizeBy: none
+		sourceColumn: review_creation_date
+
+		variation Variation
+			isDefault
+			relationship: 07ab3c91-f9d7-4078-b991-0ed8fbfc0438
+			defaultHierarchy: LocalDateTable_a038a46c-dfae-4338-adcc-b8648385d210.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column review_answer_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: eb4dc137-39de-4c8e-a9a2-fa22aabf4917
+		summarizeBy: none
+		sourceColumn: review_answer_date
+
+		variation Variation
+			isDefault
+			relationship: 7be59a64-ea7f-49ff-8ceb-cb52104cde50
+			defaultHierarchy: LocalDateTable_b2aa94c7-ea84-478a-9395-ea5796fe6552.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Fact_Reviews = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_order_reviews_dataset.csv"),[Delimiter=",", Columns=7, Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true]),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(#"Nagłówki o podwyższonym poziomie",{{"review_score", Int64.Type}, {"review_creation_date", type datetime}}),
+				    #"Podzielono kolumnę według ogranicznika" = Table.SplitColumn(Table.TransformColumnTypes(#"Zmieniono typ", {{"review_creation_date", type text}}, "pl-PL"), "review_creation_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"review_creation_date.1", "review_creation_date.2"}),
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika",{"review_creation_date.2"}),
+				    #"Zmieniono typ1" = Table.TransformColumnTypes(#"Usunięto kolumny",{{"review_creation_date.1", type date}}),
+				    #"Zmieniono nazwy kolumn" = Table.RenameColumns(#"Zmieniono typ1",{{"review_creation_date.1", "review_creation_date"}}),
+				    #"Zmieniono typ2" = Table.TransformColumnTypes(#"Zmieniono nazwy kolumn",{{"review_answer_timestamp", type datetime}}),
+				    #"Podzielono kolumnę według ogranicznika1" = Table.SplitColumn(Table.TransformColumnTypes(#"Zmieniono typ2", {{"review_answer_timestamp", type text}}, "pl-PL"), "review_answer_timestamp", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"review_answer_timestamp.1", "review_answer_timestamp.2"}),
+				    #"Usunięto kolumny1" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika1",{"review_answer_timestamp.2"}),
+				    #"Zmieniono typ3" = Table.TransformColumnTypes(#"Usunięto kolumny1",{{"review_answer_timestamp.1", type date}}),
+				    #"Zmieniono nazwy kolumn1" = Table.RenameColumns(#"Zmieniono typ3",{{"review_answer_timestamp.1", "review_answer_date"}})
+				in
+				    #"Zmieniono nazwy kolumn1"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

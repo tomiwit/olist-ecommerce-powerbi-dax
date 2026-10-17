@@ -1,0 +1,56 @@
+table Dim_Customers
+	lineageTag: 93f1e2c4-c20b-46e1-8bb8-d71da86535fb
+
+	column customer_id
+		dataType: string
+		lineageTag: 58a0d10c-85f0-48f3-b3a4-6ed0fc9a9ff3
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_unique_id
+		dataType: string
+		lineageTag: eca6d97a-5e99-43ee-848c-283e1e6268b7
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_zip_code_prefix
+		dataType: string
+		lineageTag: 5b06fad1-cbeb-4626-b583-c51bc6b25e09
+		summarizeBy: none
+		sourceColumn: customer_zip_code_prefix
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_city
+		dataType: string
+		lineageTag: 62c00e6f-2785-4acc-83cd-c743b6d28a91
+		summarizeBy: none
+		sourceColumn: customer_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_state
+		dataType: string
+		lineageTag: 66c793af-45c4-4100-a840-4a4e8d0211ca
+		summarizeBy: none
+		sourceColumn: customer_state
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Customers = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_customers_dataset.csv"),[Delimiter=",", Columns=5, Encoding=1250, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true])
+				in
+				    #"Nagłówki o podwyższonym poziomie"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

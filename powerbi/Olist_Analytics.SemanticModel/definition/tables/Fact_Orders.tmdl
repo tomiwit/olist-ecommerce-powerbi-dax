@@ -1,0 +1,143 @@
+table Fact_Orders
+	lineageTag: 50689168-45ba-441d-bd43-fb3f74bb9581
+
+	column order_id
+		dataType: string
+		lineageTag: 49873e58-cfd7-4863-ac96-f3c052fa0188
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_id
+		dataType: string
+		lineageTag: 2a09d106-d113-4dab-bf84-f2fb6194f046
+		summarizeBy: none
+		sourceColumn: customer_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_status
+		dataType: string
+		lineageTag: 28739018-9492-4c88-baf6-9924705ce798
+		summarizeBy: none
+		sourceColumn: order_status
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_purchase_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 43715050-c5cf-4852-aa83-3d3fd00bae48
+		summarizeBy: none
+		sourceColumn: order_purchase_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_purchase_timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 951dd82c-6537-40a9-a24c-8c84df4e67f9
+		summarizeBy: none
+		sourceColumn: order_purchase_timestamp
+
+		variation Variation
+			isDefault
+			relationship: 57f3d0b5-e754-447a-bbbc-8e36d2af78e7
+			defaultHierarchy: LocalDateTable_63037907-e9f1-49a4-a19b-cee378b07d79.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_approved_at_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 7e4430b8-9aa9-4994-815f-05f760f3fa3c
+		summarizeBy: none
+		sourceColumn: order_approved_at_date
+
+		variation Variation
+			isDefault
+			relationship: 5c824e66-afe6-4413-b258-6055b950191a
+			defaultHierarchy: LocalDateTable_a8ffe197-482b-4c98-9cf6-b5e2a8d60ee7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_delivered_carrier_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 64552372-b759-490d-b096-8407ccc382a5
+		summarizeBy: none
+		sourceColumn: order_delivered_carrier_date
+
+		variation Variation
+			isDefault
+			relationship: 67274b81-7224-48ef-a852-1af49c5bb358
+			defaultHierarchy: LocalDateTable_1d1640b6-7dde-4332-b830-c0ab2c56e90c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_delivered_customer_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 2984b369-5faf-41db-824b-72372ad2d1cc
+		summarizeBy: none
+		sourceColumn: order_delivered_customer_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column order_estimated_delivery_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: c02cef9d-6380-45ec-8b29-a019fb1c2536
+		summarizeBy: none
+		sourceColumn: order_estimated_delivery_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Fact_Orders = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_orders_dataset.csv"),[Delimiter=",", Columns=8, Encoding=1250, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true]),
+				    #"Podzielono kolumnę według ogranicznika" = Table.SplitColumn(#"Nagłówki o podwyższonym poziomie", "order_estimated_delivery_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"order_estimated_delivery_date.1", "order_estimated_delivery_date.2"}),
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika",{"order_estimated_delivery_date.2"}),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(#"Usunięto kolumny",{{"order_estimated_delivery_date.1", type date}}),
+				    #"Zmieniono nazwy kolumn" = Table.RenameColumns(#"Zmieniono typ",{{"order_estimated_delivery_date.1", "order_estimated_delivery_date"}}),
+				    #"Zduplikowano kolumnę" = Table.DuplicateColumn(#"Zmieniono nazwy kolumn", "order_purchase_timestamp", "order_purchase_timestamp — kopia"),
+				    #"Zmieniono kolejność kolumn" = Table.ReorderColumns(#"Zduplikowano kolumnę",{"order_id", "customer_id", "order_status", "order_purchase_timestamp", "order_purchase_timestamp — kopia", "order_approved_at", "order_delivered_carrier_date", "order_delivered_customer_date", "order_estimated_delivery_date"}),
+				    #"Zmieniono nazwy kolumn1" = Table.RenameColumns(#"Zmieniono kolejność kolumn",{{"order_purchase_timestamp — kopia", "order_purchase_date"}}),
+				    #"Zmieniono kolejność kolumn1" = Table.ReorderColumns(#"Zmieniono nazwy kolumn1",{"order_id", "customer_id", "order_status", "order_purchase_date", "order_purchase_timestamp", "order_approved_at", "order_delivered_carrier_date", "order_delivered_customer_date", "order_estimated_delivery_date"}),
+				    #"Podzielono kolumnę według ogranicznika1" = Table.SplitColumn(#"Zmieniono kolejność kolumn1", "order_purchase_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"order_purchase_date.1", "order_purchase_date.2"}),
+				    #"Usunięto kolumny1" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika1",{"order_purchase_date.2"}),
+				    #"Zmieniono nazwy kolumn2" = Table.RenameColumns(#"Usunięto kolumny1",{{"order_purchase_date.1", "order_purchase_date"}}),
+				    #"Zmieniono typ1" = Table.TransformColumnTypes(#"Zmieniono nazwy kolumn2",{{"order_purchase_date", type date}, {"order_purchase_timestamp", type datetime}}),
+				    #"Podzielono kolumnę według ogranicznika2" = Table.SplitColumn(#"Zmieniono typ1", "order_approved_at", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"order_approved_at.1", "order_approved_at.2"}),
+				    #"Usunięto kolumny2" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika2",{"order_approved_at.2"}),
+				    #"Zmieniono nazwy kolumn3" = Table.RenameColumns(#"Usunięto kolumny2",{{"order_approved_at.1", "order_approved_at_date"}}),
+				    #"Zmieniono typ2" = Table.TransformColumnTypes(#"Zmieniono nazwy kolumn3",{{"order_approved_at_date", type date}}),
+				    #"Podzielono kolumnę według ogranicznika3" = Table.SplitColumn(#"Zmieniono typ2", "order_delivered_carrier_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"order_delivered_carrier_date.1", "order_delivered_carrier_date.2"}),
+				    #"Usunięto kolumny3" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika3",{"order_delivered_carrier_date.2"}),
+				    #"Zmieniono nazwy kolumn4" = Table.RenameColumns(#"Usunięto kolumny3",{{"order_delivered_carrier_date.1", "order_delivered_carrier_date"}}),
+				    #"Zmieniono typ3" = Table.TransformColumnTypes(#"Zmieniono nazwy kolumn4",{{"order_delivered_carrier_date", type date}}),
+				    #"Podzielono kolumnę według ogranicznika4" = Table.SplitColumn(#"Zmieniono typ3", "order_delivered_customer_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"order_delivered_customer_date.1", "order_delivered_customer_date.2"}),
+				    #"Usunięto kolumny4" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika4",{"order_delivered_customer_date.2"}),
+				    #"Zmieniono typ4" = Table.TransformColumnTypes(#"Usunięto kolumny4",{{"order_delivered_customer_date.1", type date}}),
+				    #"Zmieniono nazwy kolumn5" = Table.RenameColumns(#"Zmieniono typ4",{{"order_delivered_customer_date.1", "order_delivered_customer_date"}})
+				in
+				    #"Zmieniono nazwy kolumn5"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

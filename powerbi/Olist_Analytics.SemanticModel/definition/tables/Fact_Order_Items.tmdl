@@ -1,0 +1,108 @@
+table Fact_Order_Items
+	lineageTag: 6715e3f4-efa2-47ef-8a87-20a63a4a65bd
+
+	column order_id
+		dataType: string
+		lineageTag: 80bdd8a3-c050-4ebb-bf68-8a9594eead4d
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 0a012b76-4386-42db-ac43-84fcf37aa072
+		summarizeBy: sum
+		sourceColumn: order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: 0e712388-fcfa-495b-a705-39755449d1f6
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column seller_id
+		dataType: string
+		lineageTag: 714de09e-87ac-40f8-a997-26138a10bb64
+		summarizeBy: none
+		sourceColumn: seller_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column shipping_limit_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: b2298414-e03b-4754-ad8c-5c98314b7242
+		summarizeBy: none
+		sourceColumn: shipping_limit_date
+
+		variation Variation
+			isDefault
+			relationship: f68b421b-17de-4cd0-96d9-432d1986ae4c
+			defaultHierarchy: LocalDateTable_3b9fbd27-9dfc-48b8-a903-bbc07823cfc5.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column shipping_limit_date_time_stamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 28b43ebf-6b3c-4afa-b042-e0e1b86572e7
+		summarizeBy: none
+		sourceColumn: shipping_limit_date_time_stamp
+
+		variation Variation
+			isDefault
+			relationship: f0136f21-6c3f-49b8-9236-1cfee7f0e428
+			defaultHierarchy: LocalDateTable_94c43559-954f-43c5-bf9e-01f10547c32c.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		lineageTag: 90ad214d-bc1b-405e-acc8-8b600a2e4563
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column freight_value
+		dataType: double
+		lineageTag: 7b36f902-b0d0-4708-8580-2659a6503f79
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Order_Items = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_order_items_dataset.csv"),[Delimiter=",", Columns=7, Encoding=1250, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true]),
+				    #"Zamieniono wartość" = Table.ReplaceValue(#"Nagłówki o podwyższonym poziomie",".",",",Replacer.ReplaceText,{"price", "freight_value"}),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(#"Zamieniono wartość",{{"price", type number}, {"freight_value", type number}, {"order_item_id", Int64.Type}, {"shipping_limit_date", type datetime}}),
+				    #"Zduplikowano kolumnę" = Table.DuplicateColumn(#"Zmieniono typ", "shipping_limit_date", "shipping_limit_date — kopia"),
+				    #"Zmieniono kolejność kolumn" = Table.ReorderColumns(#"Zduplikowano kolumnę",{"order_id", "order_item_id", "product_id", "seller_id", "shipping_limit_date", "shipping_limit_date — kopia", "price", "freight_value"}),
+				    #"Zmieniono nazwy kolumn" = Table.RenameColumns(#"Zmieniono kolejność kolumn",{{"shipping_limit_date — kopia", "shipping_limit_date_time_stamp"}}),
+				    #"Podzielono kolumnę według ogranicznika" = Table.SplitColumn(Table.TransformColumnTypes(#"Zmieniono nazwy kolumn", {{"shipping_limit_date", type text}}, "pl-PL"), "shipping_limit_date", Splitter.SplitTextByDelimiter(" ", QuoteStyle.Csv), {"shipping_limit_date.1", "shipping_limit_date.2"}),
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Podzielono kolumnę według ogranicznika",{"shipping_limit_date.2"}),
+				    #"Zmieniono typ1" = Table.TransformColumnTypes(#"Usunięto kolumny",{{"shipping_limit_date.1", type date}}),
+				    #"Zmieniono nazwy kolumn1" = Table.RenameColumns(#"Zmieniono typ1",{{"shipping_limit_date.1", "shipping_limit_date"}})
+				in
+				    #"Zmieniono nazwy kolumn1"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

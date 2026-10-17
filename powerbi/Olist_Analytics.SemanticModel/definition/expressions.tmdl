@@ -1,0 +1,12 @@
+expression category_name_translation =
+		let
+		    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\product_category_name_translation.csv"),[Delimiter=",", Columns=2, Encoding=65001, QuoteStyle=QuoteStyle.None]),
+		    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true])
+		in
+		    #"Nagłówki o podwyższonym poziomie"
+	lineageTag: 22994b03-e5f6-4dc5-8c67-399e390d4021
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,72 @@
+table Dim_Calendar
+	lineageTag: b40ab78a-0f9c-4567-be69-1314bd6fac46
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: General Date
+		lineageTag: 4a328a5e-5ad0-439a-a946-242ba1203ad1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year = YEAR(Dim_Calendar[Date])
+		formatString: 0
+		lineageTag: d0f89804-2d6e-4888-b7c5-5e454c513c5f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter = "Q" & FORMAT(Dim_Calendar[Date],"Q")
+		lineageTag: 30c88080-025a-49cc-8eb6-ce602ea48a85
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo = ```
+			MONTH(Dim_Calendar[Date]) 
+			```
+		formatString: 0
+		lineageTag: c7fe8323-ea10-4a3a-a6c7-2c1cd1996eaa
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Name' = FORMAT(Dim_Calendar[Date],"mmmm")
+		lineageTag: d81ae84e-bd27-48c3-93d4-b4976c7395bb
+		summarizeBy: none
+		sortByColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Short' = FORMAT(Dim_Calendar[Date],"mmm")
+		lineageTag: 963ed68c-b1ff-4635-b260-dbbeeb8fe033
+		summarizeBy: none
+		sortByColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of week number' = ```
+			WEEKDAY(Dim_Calendar[Date],2)   
+			```
+		formatString: 0
+		lineageTag: 48563ef8-652d-4b49-8078-950ee68c1c2a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of week' = FORMAT(Dim_Calendar[Date],"dddd")
+		lineageTag: c5248371-d8d8-4754-b30a-30d37bee6705
+		summarizeBy: none
+		sortByColumn: 'Day of week number'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Calendar = calculated
+		mode: import
+		source = CALENDAR(DATE(2016,01,01), DATE(2018,12,31))
+
+	annotation PBI_Id = 92b2315f81b84aa088906d327204d2d8
+

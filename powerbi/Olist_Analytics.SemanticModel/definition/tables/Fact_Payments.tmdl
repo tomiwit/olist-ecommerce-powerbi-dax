@@ -1,0 +1,63 @@
+table Fact_Payments
+	lineageTag: a33d6b21-debb-46ff-9a67-571cf74e6b01
+
+	column order_id
+		dataType: string
+		lineageTag: f011ccc5-a2bc-49b4-97f4-a710e88d6ac5
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_sequential
+		dataType: int64
+		formatString: 0
+		lineageTag: b2d8d124-ef73-4440-969a-bdf86ba768e0
+		summarizeBy: sum
+		sourceColumn: payment_sequential
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_type
+		dataType: string
+		lineageTag: 78286c60-5c8c-42f3-a32c-80f7cc3d1fff
+		summarizeBy: none
+		sourceColumn: payment_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_installments
+		dataType: int64
+		formatString: 0
+		lineageTag: 0b43bb67-368b-4592-ae7e-017f78446b7f
+		summarizeBy: sum
+		sourceColumn: payment_installments
+
+		annotation SummarizationSetBy = Automatic
+
+	column payment_value
+		dataType: double
+		lineageTag: 92d6f0ec-3bd1-4398-aac2-884e3f856429
+		summarizeBy: sum
+		sourceColumn: payment_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Fact_Payments = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_order_payments_dataset.csv"),[Delimiter=",", Columns=5, Encoding=1250, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true]),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(#"Nagłówki o podwyższonym poziomie",{{"payment_sequential", Int64.Type}, {"payment_value", type text}, {"payment_installments", Int64.Type}}),
+				    #"Zamieniono wartość" = Table.ReplaceValue(#"Zmieniono typ",".",",",Replacer.ReplaceText,{"payment_value"}),
+				    #"Zmieniono typ1" = Table.TransformColumnTypes(#"Zamieniono wartość",{{"payment_value", type number}})
+				in
+				    #"Zmieniono typ1"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+

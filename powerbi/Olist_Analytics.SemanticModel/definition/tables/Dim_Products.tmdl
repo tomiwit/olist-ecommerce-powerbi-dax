@@ -1,0 +1,110 @@
+table Dim_Products
+	lineageTag: a576c818-84cb-4294-94bf-171e73acac90
+
+	column product_id
+		dataType: string
+		lineageTag: dc076c11-31c8-4033-a58b-7b4efeb27e99
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name_lenght
+		dataType: double
+		lineageTag: 09423413-0701-4751-82f7-13c2d776008d
+		summarizeBy: none
+		sourceColumn: product_name_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_description_lenght
+		dataType: double
+		lineageTag: 6afd872f-f8a7-4e65-ae6b-53233451f4fd
+		summarizeBy: none
+		sourceColumn: product_description_lenght
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_photos_qty
+		dataType: double
+		lineageTag: 22100459-7ee3-47af-9253-6d5ca5eadc76
+		summarizeBy: none
+		sourceColumn: product_photos_qty
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_weight_g
+		dataType: double
+		lineageTag: 53cf6e08-8bfc-4145-8910-fb6b102707fa
+		summarizeBy: none
+		sourceColumn: product_weight_g
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_length_cm
+		dataType: double
+		lineageTag: aaadce25-24cf-4dab-a6e4-8b53ffe337f0
+		summarizeBy: none
+		sourceColumn: product_length_cm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_height_cm
+		dataType: double
+		lineageTag: 168aa929-2a4e-472b-ba2c-8f9ea3ae4e78
+		summarizeBy: none
+		sourceColumn: product_height_cm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column product_width_cm
+		dataType: double
+		lineageTag: 72f3c4bb-fc64-4056-be6d-3e52dc124b06
+		summarizeBy: none
+		sourceColumn: product_width_cm
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Category Name'
+		dataType: string
+		lineageTag: cefdf7f2-9973-4184-8ec3-3ed10bf11ad5
+		summarizeBy: none
+		sourceColumn: Category Name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Dim_Products = m
+		mode: import
+		source =
+				let
+				    Źródło = Csv.Document(File.Contents("C:\olist-ecommerce-powerbi-dax\data\olist_products_dataset.csv"),[Delimiter=",", Columns=9, Encoding=1250, QuoteStyle=QuoteStyle.None]),
+				    #"Nagłówki o podwyższonym poziomie" = Table.PromoteHeaders(Źródło, [PromoteAllScalars=true]),
+				    #"Scalone zapytania" = Table.NestedJoin(#"Nagłówki o podwyższonym poziomie", {"product_category_name"}, category_name_translation, {"product_category_name"}, "category_name_translation", JoinKind.LeftOuter),
+				    #"Rozwinięty element category_name_translation" = Table.ExpandTableColumn(#"Scalone zapytania", "category_name_translation", {"product_category_name", "product_category_name_english"}, {"category_name_translation.product_category_name", "category_name_translation.product_category_name_english"}),
+				    #"Dodano kolumnę warunkową" = Table.AddColumn(#"Rozwinięty element category_name_translation", "Category Name", each if [category_name_translation.product_category_name_english] <> null then "category_name_transaltion.product_category_name_english" else if [product_category_name] = "pc_gamer" then "pc_gamer" else if [product_category_name] = "portateis_cozinha_e_preparadores_de_alimentos" then "kitchen_and_food_preparers" else "unknown"),
+				    #"Usunięto kolumny" = Table.RemoveColumns(#"Dodano kolumnę warunkową",{"Category Name"}),
+				    #"Dodano kolumnę warunkową1" = Table.AddColumn(#"Usunięto kolumny", "Category Name", each if [category_name_translation.product_category_name_english] <> null then [category_name_translation.product_category_name_english] else if [category_name_translation.product_category_name] = "pc_gamer" then "pc_gamer" else if [category_name_translation.product_category_name] = "portateis_cozinha_e_preparadores_de_alimentos" then "kitchen_and_food_preparers" else "unknown"),
+				    #"Zmieniono kolejność kolumn" = Table.ReorderColumns(#"Dodano kolumnę warunkową1",{"product_id", "Category Name", "product_category_name", "product_name_lenght", "product_description_lenght", "product_photos_qty", "product_weight_g", "product_length_cm", "product_height_cm", "product_width_cm", "category_name_translation.product_category_name", "category_name_translation.product_category_name_english"}),
+				    #"Usunięto kolumny1" = Table.RemoveColumns(#"Zmieniono kolejność kolumn",{"product_category_name", "category_name_translation.product_category_name", "category_name_translation.product_category_name_english"}),
+				    #"Zmieniono typ" = Table.TransformColumnTypes(#"Usunięto kolumny1",{{"product_name_lenght", type number}, {"product_description_lenght", type number}, {"product_photos_qty", type number}, {"product_weight_g", type number}, {"product_length_cm", type number}, {"product_height_cm", type number}, {"product_width_cm", type number}})
+				in
+				    #"Zmieniono typ"
+
+	annotation PBI_NavigationStepName = Nawigacja
+
+	annotation PBI_ResultType = Table
+
