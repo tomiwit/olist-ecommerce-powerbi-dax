@@ -4,14 +4,14 @@
     {
       "ordinal": 0,
       "scrollPosition": {
-        "x": 0,
-        "y": 600.37592072376913
+        "x": 16.911997766866733,
+        "y": 560.91459260108
       },
       "nodes": [
         {
           "location": {
             "x": 85.390722592184176,
-            "y": 764.0924649372281
+            "y": 1109.4057847476872
           },
           "nodeIndex": "Dim_Customers",
           "nodeLineageTag": "93f1e2c4-c20b-46e1-8bb8-d71da86535fb",
@@ -24,7 +24,7 @@
         {
           "location": {
             "x": 1416.4890015840233,
-            "y": 990.63702841646534
+            "y": 1335.9503482269245
           },
           "nodeIndex": "Dim_Products",
           "nodeLineageTag": "a576c818-84cb-4294-94bf-171e73acac90",
@@ -37,7 +37,7 @@
         {
           "location": {
             "x": 931.19230681450881,
-            "y": 700.67122035198167
+            "y": 1045.9845401624407
           },
           "nodeIndex": "Dim_Sellers",
           "nodeLineageTag": "5ddf7cb6-a8b1-4b37-becb-2b32ff5a34b0",
@@ -50,7 +50,7 @@
         {
           "location": {
             "x": 935.743321119118,
-            "y": 1003.2697648337928
+            "y": 1348.5830846442518
           },
           "nodeIndex": "Fact_Order_Items",
           "nodeLineageTag": "6715e3f4-efa2-47ef-8a87-20a63a4a65bd",
@@ -63,7 +63,7 @@
         {
           "location": {
             "x": 526.9533140037139,
-            "y": 966.67559934211067
+            "y": 1311.9889191525697
           },
           "nodeIndex": "Fact_Orders",
           "nodeLineageTag": "50689168-45ba-441d-bd43-fb3f74bb9581",
@@ -76,7 +76,7 @@
         {
           "location": {
             "x": 538.6343173099674,
-            "y": 690.62663962091813
+            "y": 1035.9399594313772
           },
           "nodeIndex": "Fact_Payments",
           "nodeLineageTag": "a33d6b21-debb-46ff-9a67-571cf74e6b01",
@@ -89,7 +89,7 @@
         {
           "location": {
             "x": 527.02121520844184,
-            "y": 1379.1810616500916
+            "y": 1724.4943814605506
           },
           "nodeIndex": "Fact_Reviews",
           "nodeLineageTag": "c18bf801-85bd-4818-ad85-15b8c67e860d",
@@ -102,7 +102,7 @@
         {
           "location": {
             "x": 82.789993168247548,
-            "y": 1211.2837031433539
+            "y": 1556.5970229538129
           },
           "nodeIndex": "Dim_Calendar",
           "nodeLineageTag": "b40ab78a-0f9c-4567-be69-1314bd6fac46",
@@ -111,6 +111,19 @@
             "width": 234
           },
           "zIndex": 8
+        },
+        {
+          "location": {
+            "x": 1617.6990084157758,
+            "y": 774.78924862746385
+          },
+          "nodeIndex": "_Measures",
+          "nodeLineageTag": "9a15ddbb-5e97-401a-ba67-dee873ed7074",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "Wszystkie tabele",

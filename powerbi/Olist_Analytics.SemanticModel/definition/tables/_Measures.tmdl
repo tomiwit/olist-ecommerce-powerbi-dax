@@ -1,0 +1,128 @@
+table _Measures
+	lineageTag: 9a15ddbb-5e97-401a-ba67-dee873ed7074
+
+	measure 'Items value' = SUM(Fact_Order_Items[price])
+		lineageTag: cc03c245-00f8-4e08-b033-87753a999087
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Freight value' = SUM(Fact_Order_Items[freight_value])
+		lineageTag: 132c54db-51b8-4e69-80e7-2619374018b4
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Gross Revenue' = [Freight value] + [Items value]
+		lineageTag: 8380d289-9102-46a5-8a73-09c7089e7fb4
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Revenue' =
+			
+			CALCULATE( [Gross Revenue] ,    Fact_Orders, Fact_Orders[order_status] <> "canceled" && Fact_Orders[order_status] <> "unavailable" )
+		lineageTag: 0297c301-f730-4d02-87b0-045671337cbd
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Orders' = CALCULATE( DISTINCTCOUNT(Fact_Orders[order_id]) , Fact_Orders, Fact_Orders[order_status] <> "canceled" && Fact_Orders[order_status] <> "unavailable")
+		formatString: 0
+		lineageTag: 3c71bd6d-1c63-4d9d-9a12-598e4837a496
+
+		changedProperty = IsHidden
+
+	measure test_mes = DISTINCTCOUNT(Fact_Order_Items[order_id])
+		formatString: 0
+		lineageTag: 20ef004d-6481-43fc-80c0-351d620fdc7c
+
+	measure 'Total Items Solds' = CALCULATE(COUNTROWS(Fact_Order_Items), Fact_Orders[order_status] <> "canceled" && Fact_Orders[order_status] <> "unavailable")
+		formatString: 0
+		lineageTag: 4e72b8de-0431-4a4c-b1d8-24b128d1a9cc
+
+	measure AOV = DIVIDE([Total Revenue], [Total Orders])
+		lineageTag: 82ef9eb1-e501-4f5f-9124-8fcf7e98714d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Items per Order' = DIVIDE([Total Items Solds],[Total Orders])
+		lineageTag: 22280e20-cde3-44e9-914a-2972345b8bef
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue YTD' = TOTALYTD( [Total Revenue], Dim_Calendar[Date])
+		lineageTag: 9d6eadb0-7885-46c1-a9c1-4912e1ba5cb3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue PY' = CALCULATE([Total Revenue], SAMEPERIODLASTYEAR(Dim_Calendar[Date]))
+		lineageTag: 87712dd9-ff03-48e0-9b51-4ebe780a62a5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue YoY%' =
+			
+			VAR act_rev = [Total Revenue]
+			VAR prev_rev = [Revenue PY]
+			return
+			DIVIDE( act_rev - prev_rev, prev_rev)
+		lineageTag: d7e44b15-1146-4a62-8bc7-45548692a250
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Revenue Rolling 3M Avg' = CALCULATE( DIVIDE([Total Revenue],3) , DATESINPERIOD(Dim_Calendar[Date], MAX(Dim_Calendar[Date]), -3, MONTH))
+		lineageTag: eb952255-6981-4b75-9b35-0480c9267a00
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Payment Value' = SUM(Fact_Payments[payment_value])
+		lineageTag: 63752997-7792-4362-ac46-e7c562632d15
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Payment Value' = CALCULATE( SUM(Fact_Payments[payment_value]) , Fact_Orders, Fact_Orders[order_status] <> "canceled" && Fact_Orders[order_status] <> "unavailable" )
+		lineageTag: 969ba9ad-25fe-4ef0-8a1c-9d53379e1f1e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Payment Type Share %' =
+			
+			VAR mianownik = CALCULATE( [Total Payment Value] , ALL(Fact_Payments[payment_type]))
+			RETURN
+			DIVIDE( [Total Payment Value] , mianownik)
+		lineageTag: 56d22e26-eba4-4f77-b130-01c38bd4f35e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Avg Installaments' = CALCULATE( AVERAGE(Fact_Payments[payment_installments]) , Fact_Payments[payment_type] = "credit_card")
+		lineageTag: 8727c13e-4fab-469e-8c73-5fdcfcc0f2dd
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Kolumna 1'
+		dataType: string
+		lineageTag: 10a29613-a1c8-445a-8518-10e6de9c72d2
+		summarizeBy: none
+		sourceColumn: Kolumna 1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Źródło = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [#"Kolumna 1" = _t])
+				in
+				    Źródło
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

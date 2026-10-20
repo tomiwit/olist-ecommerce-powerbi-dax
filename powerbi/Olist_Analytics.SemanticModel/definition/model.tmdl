@@ -11,7 +11,7 @@ annotation __PBI_TimeIntelligenceEnabled = 1
 
 annotation PBI_ProTooling = ["DevMode"]
 
-annotation PBI_QueryOrder = ["Dim_Customers","Dim_Sellers","Dim_Products","category_name_translation","Fact_Order_Items","Fact_Payments","Fact_Reviews","Fact_Orders"]
+annotation PBI_QueryOrder = ["Dim_Customers","Dim_Sellers","Dim_Products","category_name_translation","Fact_Order_Items","Fact_Payments","Fact_Reviews","Fact_Orders","_Measures"]
 
 ref table Dim_Customers
 ref table Dim_Sellers
@@ -29,6 +29,7 @@ ref table LocalDateTable_63037907-e9f1-49a4-a19b-cee378b07d79
 ref table LocalDateTable_a8ffe197-482b-4c98-9cf6-b5e2a8d60ee7
 ref table LocalDateTable_1d1640b6-7dde-4332-b830-c0ab2c56e90c
 ref table Dim_Calendar
+ref table _Measures
 
 ref cultureInfo en-US
 
